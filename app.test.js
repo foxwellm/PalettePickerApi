@@ -18,7 +18,7 @@ describe('Server', () => {
       expect(response.body.length).toEqual(numExpectedProjects);
     });
 
-    it('should respond with a 200 and matching projects if a name query is given', async () => {
+    it.skip('should respond with a 200 and matching projects if a name query is given', async () => {
       const expectedProject = await database('projects').first();
       const response = await request(app).get('/api/v1/projects?name=Project+1');
       expect(response.status).toEqual(200);
@@ -45,6 +45,26 @@ describe('Server', () => {
       // if table doesn't exist?
     });
   });
+
+  describe('GET /api/v1/projects/:id', () => {
+
+    it('should respond with a 200 and the specific project if it exists', async () => {
+      const expectedProject = await database('projects').first();
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id}`)
+      expect(response.status).toEqual(200)
+      expect(response.body[0].id).toEqual(expectedProject.id)
+    })
+
+    it('should respond with a 204 if the specific project does not exist', async () => {
+      const expectedProject = await database('projects').first();
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}`)
+      expect(response.status).toEqual(204)
+    })
+
+    it('should respond with a 500 and error message if not successful', async () => {
+      // if table doesn't exist?
+    })
+  })
 
   
 })
