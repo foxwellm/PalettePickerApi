@@ -66,5 +66,25 @@ describe('Server', () => {
     })
   })
 
+  describe('GET /api/v1/palettes/:id', () => {
+
+    it('should respond with a 200 and the specific palette if it exists', async () => {
+      const expectedPalette = await database('palettes').first();
+      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id}`)
+      expect(response.status).toEqual(200)
+      expect(response.body[0].id).toEqual(expectedPalette.id)
+    })
+
+    it('should respond with a 204 if the specific palette does not exist', async () => {
+      const expectedPalette = await database('palettes').first();
+      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id - 1}`)
+      expect(response.status).toEqual(204)
+    })
+
+    it('should respond with a 500 and error message if not successful', async () => {
+      // if table doesn't exist?
+    })
+  })
+
   
 })
