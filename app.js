@@ -26,6 +26,14 @@ app.get('/api/v1/projects/:id', async (req, res) => {
   }
 })
 
-
+app.get('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    let matchingPalette = await database('palettes').where('id', id).select();
+    return matchingPalette.length ? res.status(200).json(matchingPalette) : res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+})
 
 module.exports = app;
