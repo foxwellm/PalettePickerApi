@@ -16,13 +16,29 @@ describe('Server', () => {
       const response = await request(app).get('/api/v1/projects');
       expect(response.status).toEqual(200);
       expect(response.body.length).toEqual(numExpectedProjects);
-    })
+    });
+
+    it('should respond with a 200 and matching projects if a name query is given', async () => {
+      const expectedProject = await database('projects').first();
+      const response = await request(app).get('/api/v1/projects?name=Project+1');
+      expect(response.status).toEqual(200);
+      // how do we get created at and updated at fields to match up - json vs string?
+      expect(response.body).toEqual([expectedProject]);
+    });
+
+    it('should respond with a 200 and matching projects if a partial name query is given', async () => {
+
+    });
     
     it('should respond with a 204 if there are no projects in the db', async () => {
       await database('palettes').del();
       await database('projects').del();
       const response = await request(app).get('/api/v1/projects');
       expect(response.status).toEqual(204);
+    });
+
+    it('should respond with a 204 if a name query is given with no matches', async () => {
+
     });
 
     it('should respond with a 500 and error message if not successful', async () => {
