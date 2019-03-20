@@ -42,9 +42,6 @@ describe('Server', () => {
 
     });
 
-    it('should respond with a 500 and error message if not successful', async () => {
-      // if table doesn't exist?
-    });
   });
 
   describe('GET /api/v1/projects/:id', () => {
@@ -63,9 +60,6 @@ describe('Server', () => {
       expect(response.status).toEqual(204);
     })
 
-    it('should respond with a 500 and error message if not successful', async () => {
-      // if table doesn't exist?
-    })
   })
 
   describe('GET /api/v1/palettes/:id', () => {
@@ -84,9 +78,6 @@ describe('Server', () => {
       expect(response.status).toEqual(204);
     })
 
-    it('should respond with a 500 and error message if not successful', async () => {
-      // if table doesn't exist?
-    })
   })
 
   describe('GET /api/v1/projects/:id/palettes', () => {
@@ -118,6 +109,61 @@ describe('Server', () => {
       expect(response.body.matchingProject[0].id).toEqual(expectedProject[0].id);
       expect(response.body.matchingPalettes).toEqual(expectedPalettes);
     })
+  })
+
+  describe('POST /api/v1/projects', () => {
+
+    it('should respond with a 201 and add project', async () => {
+      const startingProjects = await database('projects')
+      const response = await request(app).post('/api/v1/projects').send({name: 'New Project'})
+      const expectedProjects = await database('projects')
+      expect(response.status).toEqual(201);
+      expect(startingProjects.length + 1).toEqual(expectedProjects.length);
+    })
+
+    it('should respond with a 422 if no name provided', async () => {
+      const response = await request(app).post('/api/v1/projects')
+      expect(response.status).toEqual(422);
+      expect(response.text).toEqual('"No project name provided"')
+    })
+
+  })
+
+  describe('POST /api/v1/palettes', () => {
+
+    it('should respond with a 201 and add pallete if succesful', async () => {
+      const projectToAddTo = await database('projects').first()
+      const newPalette = {
+        name: 'New Palette',
+        color1: '434f4f',
+        color2: 'nr44j4',
+        color3: 'h4b3b4',
+        color4: 'jn4n44',
+        color5: 'jhb4bk',
+        project_id: projectToAddTo.id
+      }
+      const currentPalettes = await database('palettes').where('project_id', projectToAddTo.id)
+      const response = await request(app).post('/api/v1/palettes').send(newPalette)
+      const expectedPalettes = await database('palettes').where('project_id', projectToAddTo.id)
+      expect(response.status).toEqual(201);
+      expect(currentPalettes.length + 1).toEqual(expectedPalettes.length)
+    })
+
+    it('should respond with a 422 and message about what is missing if a parameter is missing', async () => {
+      const projectToAddTo = await database('projects').first()
+      const newPalette = {
+        name: 'New Palette',
+        color1: '434f4f',
+        color3: 'h4b3b4',
+        color4: 'jn4n44',
+        color5: 'jhb4bk',
+        project_id: projectToAddTo.id
+      }
+      const response = await request(app).post('/api/v1/palettes').send(newPalette)
+      expect(response.status).toEqual(422);
+      expect(response.text).toEqual("Expected format: { name: <String>, color1: <String>, color2: <String>, color3: <String>, color4: <String>, color5: <String>, project_id: <Number>}. You're missing a color2 property.")
+    })
+
   })
 
   describe('DELETE /api/v1/projects/:id', () => {
@@ -167,6 +213,18 @@ describe('Server', () => {
       const response = await request(app).delete(`/api/v1/palettes/${nonExistantPalette}`);
       expect(response.status).toEqual(204);
     });
+  })
+
+  describe.skip('PUT /api/v1/projects/:id', () => {
+
+    it('should respond with a 202 if it was successful and have removed a palette from the database', async () => {
+      const projectToChange = await database('projects').first()
+      const response = await request(app).put(`/api/v1/projects/${projectToChange.id}`).send({ name: 'New Name'});
+      const updatedProject = await database('projects').first();
+      expect(response.status).toEqual(202);
+      expect(updatedProject).not.toEqual(projectToChange);
+    });
+
   })
 
 })
