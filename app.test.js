@@ -12,7 +12,8 @@ describe('Server', () => {
 
   describe('GET /api/v1/projects', () => {
     it('should respond with a 200 and all projects in db if successful', async () => {
-      const numExpectedProjects = 3;
+      const currentProjects = await database('projects')
+      const numExpectedProjects = currentProjects.length;
       const response = await request(app).get('/api/v1/projects');
       expect(response.status).toEqual(200);
       expect(response.body.length).toEqual(numExpectedProjects);
@@ -56,8 +57,9 @@ describe('Server', () => {
     })
 
     it('should respond with a 204 if the specific project does not exist', async () => {
-      const expectedProject = await database('projects').first();
-      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}`);
+      const firstProject = await database('projects').first();
+      const nonExistantProject = firstProject.id -1;
+      const response = await request(app).get(`/api/v1/projects/${nonExistantProject}`);
       expect(response.status).toEqual(204);
     })
 
@@ -76,8 +78,9 @@ describe('Server', () => {
     })
 
     it('should respond with a 204 if the specific palette does not exist', async () => {
-      const expectedPalette = await database('palettes').first();
-      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id - 1}`);
+      const firstPalette = await database('palettes').first();
+      const nonExistantPalette = firstPalette.id - 1;
+      const response = await request(app).get(`/api/v1/palettes/${nonExistantPalette}`);
       expect(response.status).toEqual(204);
     })
 
@@ -99,8 +102,9 @@ describe('Server', () => {
     })
 
     it('should respond with a 204 if the specific project does not exist', async () => {
-      const expectedProject = await database('projects').first();
-      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}/palettes`);
+      const firstProject = await database('projects').first();
+      const nonExistantProject = firstProject.id - 1;
+      const response = await request(app).get(`/api/v1/projects/${nonExistantProject}/palettes`);
       expect(response.status).toEqual(204);
     })
 
@@ -114,6 +118,25 @@ describe('Server', () => {
       expect(response.body.matchingProject[0].id).toEqual(expectedProject[0].id);
       expect(response.body.matchingPalettes).toEqual(expectedPalettes);
     })
+  })
+
+  describe('DELETE /api/v1/palettes/:id', () => {
+
+    it('should respond with a 202 and palette Id if it was successful and have removed a palette from the database', async () => {
+      const allPalettes = await database('palettes');
+      const numExpectedPalettes = allPalettes.length - 1;
+      const response = await request(app).delete(`/api/v1/palettes/${allPalettes[0].id}`);
+      const remainingPalettes = await database('palettes');
+      expect(response.status).toEqual(202);
+      expect(numExpectedPalettes).toEqual(remainingPalettes.length);
+    });
+
+    it('should respond with a 204 if palette with specific id does not exist', async () => {
+      const firstPalette = await database('palettes').first();
+      const nonExistantPalette = firstPalette.id - 1;
+      const response = await request(app).delete(`/api/v1/palettes/${nonExistantPalette}`);
+      expect(response.status).toEqual(204);
+    });
   })
 
 })

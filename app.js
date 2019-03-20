@@ -46,4 +46,18 @@ app.get('/api/v1/projects/:id/palettes', async (req, res) => {
   }
 })
 
+app.delete('/api/v1/palettes/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const matchingPalette = await database('palettes').where('id', id).select();
+    if(matchingPalette.length) {
+      await database('palettes').where('id', id).del();
+      return res.sendStatus(202)
+    }
+    return res.sendStatus(204);
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+})
+
 module.exports = app;
