@@ -12,7 +12,7 @@ describe('Server', () => {
 
   describe('GET /api/v1/projects', () => {
     it('should respond with a 200 and all projects in db if successful', async () => {
-      const numExpectedProjects = 2;
+      const numExpectedProjects = 3;
       const response = await request(app).get('/api/v1/projects');
       expect(response.status).toEqual(200);
       expect(response.body.length).toEqual(numExpectedProjects);
@@ -50,15 +50,15 @@ describe('Server', () => {
 
     it('should respond with a 200 and the specific project if it exists', async () => {
       const expectedProject = await database('projects').first();
-      const response = await request(app).get(`/api/v1/projects/${expectedProject.id}`)
-      expect(response.status).toEqual(200)
-      expect(response.body[0].id).toEqual(expectedProject.id)
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id}`);
+      expect(response.status).toEqual(200);
+      expect(response.body[0].id).toEqual(expectedProject.id);
     })
 
     it('should respond with a 204 if the specific project does not exist', async () => {
       const expectedProject = await database('projects').first();
-      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}`)
-      expect(response.status).toEqual(204)
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}`);
+      expect(response.status).toEqual(204);
     })
 
     it('should respond with a 500 and error message if not successful', async () => {
@@ -70,15 +70,15 @@ describe('Server', () => {
 
     it('should respond with a 200 and the specific palette if it exists', async () => {
       const expectedPalette = await database('palettes').first();
-      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id}`)
-      expect(response.status).toEqual(200)
-      expect(response.body[0].id).toEqual(expectedPalette.id)
+      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id}`);
+      expect(response.status).toEqual(200);
+      expect(response.body[0].id).toEqual(expectedPalette.id);
     })
 
     it('should respond with a 204 if the specific palette does not exist', async () => {
       const expectedPalette = await database('palettes').first();
-      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id - 1}`)
-      expect(response.status).toEqual(204)
+      const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id - 1}`);
+      expect(response.status).toEqual(204);
     })
 
     it('should respond with a 500 and error message if not successful', async () => {
@@ -86,5 +86,34 @@ describe('Server', () => {
     })
   })
 
-  
+  describe('GET /api/v1/projects/:id/palettes', () => {
+
+    it.skip('should respond with a 200 and the specific project if it exists with all its associated palettes', async () => {
+      const expectedProject = await database('projects').first();
+      const allPalettes = await database('palettes');
+      const expectedPalettes = allPalettes.filter(palette => palette.project_id === expectedProject.id);
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id}/palettes`);
+      expect(response.status).toEqual(200);
+      expect(response.body.matchingProject[0].id).toEqual(expectedProject.id);
+      expect(response.body.matchingPalettes).toEqual([expectedPalettes]);
+    })
+
+    it('should respond with a 204 if the specific project does not exist', async () => {
+      const expectedProject = await database('projects').first();
+      const response = await request(app).get(`/api/v1/projects/${expectedProject.id - 1}/palettes`);
+      expect(response.status).toEqual(204);
+    })
+
+    it(`should respond with a 200, the specific project and an empty array
+        if it exists but has no associated palettes`, async () => {
+      const expectedProject = await database('projects').where('name', 'Empty').select();
+      const allPalettes = await database('palettes');
+      const expectedPalettes = allPalettes.filter(palette => palette.project_id === expectedProject[0].id);
+      const response = await request(app).get(`/api/v1/projects/${expectedProject[0].id}/palettes`);
+      expect(response.status).toEqual(200);
+      expect(response.body.matchingProject[0].id).toEqual(expectedProject[0].id);
+      expect(response.body.matchingPalettes).toEqual(expectedPalettes);
+    })
+  })
+
 })
