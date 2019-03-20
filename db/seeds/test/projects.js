@@ -41,6 +41,10 @@ const projectData = [
         color5: 'd6eaf8'
       }
     ]
+  },
+  {
+    name: 'Empty',
+    palettes: []
   }
 ]
 
