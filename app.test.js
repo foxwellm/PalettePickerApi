@@ -120,9 +120,39 @@ describe('Server', () => {
     })
   })
 
+  describe('DELETE /api/v1/projects/:id', () => {
+
+    it('should respond with a 202 if it was successful and has removed a project from the database with all associated palettes', async () => {
+      const projectToDelete = await database('projects').first();
+      const allPalettes = await database('palettes');
+      const palettesToDelete = await database('palettes').where('project_id', projectToDelete.id);
+      const numExpectedPalettes= allPalettes.length - palettesToDelete.length;
+      const response = await request(app).delete(`/api/v1/projects/${projectToDelete.id}`);
+      const remainingPalettes = await database('palettes');
+      expect(response.status).toEqual(202);
+      expect(numExpectedPalettes).toEqual(remainingPalettes.length);
+    });
+
+    it('should respond with a 202 if it was successful and has removed a project from the database even if no associated palettes exist', async () => {
+      const projectToDelete = await database('projects').where('name', 'Empty')
+      const numExpectedPalettes = await database('palettes');
+      const response = await request(app).delete(`/api/v1/projects/${projectToDelete[0].id}`);
+      const remainingPalettes = await database('palettes');
+      expect(response.status).toEqual(202);
+      expect(numExpectedPalettes.length).toEqual(remainingPalettes.length);
+    });
+
+    it('should respond with a 204 if project with specific id does not exist', async () => {
+      const firstProject = await database('projects').first();
+      const nonExistantProject = firstProject.id - 1;
+      const response = await request(app).delete(`/api/v1/palettes/${nonExistantProject}`);
+      expect(response.status).toEqual(204);
+    });
+  })
+
   describe('DELETE /api/v1/palettes/:id', () => {
 
-    it('should respond with a 202 and palette Id if it was successful and have removed a palette from the database', async () => {
+    it('should respond with a 202 if it was successful and have removed a palette from the database', async () => {
       const allPalettes = await database('palettes');
       const numExpectedPalettes = allPalettes.length - 1;
       const response = await request(app).delete(`/api/v1/palettes/${allPalettes[0].id}`);
