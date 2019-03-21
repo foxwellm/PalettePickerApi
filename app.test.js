@@ -214,16 +214,23 @@ describe('Server', () => {
     });
   });
 
-  describe.skip('PUT /api/v1/projects/:id', () => {
-
-    it('should respond with a 202 if it was successful and have removed a palette from the database', async () => {
+  describe('PUT /api/v1/projects/:id', () => {
+    it('should respond with a 204 if project was successfully updated', async () => {
       const projectToChange = await database('projects').first()
       const response = await request(app).put(`/api/v1/projects/${projectToChange.id}`).send({ name: 'New Name'});
       const updatedProject = await database('projects').first();
-      expect(response.status).toEqual(202);
+      expect(response.status).toEqual(204);
       expect(updatedProject).not.toEqual(projectToChange);
     });
 
-  })
+    it('should respond with a 422 and message if name is not provided', async () => {
 
-})
+    });
+
+    it('should respond with a 404 and message if project was not found', async () => {
+
+    });
+
+  });
+
+});
