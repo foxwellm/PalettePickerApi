@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const environment = process.env.NODE_ENV || 'development';
 const configuration = require('./knexfile')[environment];
 const database = require('knex')(configuration);
 app.use(express.json());
+app.use(cors());
 
 app.get('/api/v1/projects', async (req, res) => {
   const name = req.query.name;
