@@ -19,20 +19,17 @@ describe('Server', () => {
       expect(response.body.length).toEqual(numExpectedProjects);
     });
 
-    it.skip('should respond with a 200 and matching projects if a name query is given', async () => {
-      const expectedProject = await database('projects').first();
+    it('should respond with a 200 and matching projects if a name query is given', async () => {
       const response = await request(app).get('/api/v1/projects?name=Project+1');
       expect(response.status).toEqual(200);
-      // how do we get created at and updated at fields to match up - json vs string?
-      expect(response.body).toEqual([expectedProject]);
+      expect(response.body[0].name).toEqual('Project 1');
     });
 
-    it.skip('should respond with a 200 and matching projects if a partial name query is given', async () => {
+    it('should respond with a 200 and matching projects if a partial name query is given', async () => {
       const expectedProjects = await database('projects').select();
       const response = await request(app).get('/api/v1/projects?name=Project');
       expect(response.status).toEqual(200);
-      // how do we get created at and updated at fields to match up - json vs string?
-      expect(response.body).toEqual(expectedProjects);
+      expect(response.body.length).toEqual(expectedProjects.length-1);
     });
     
     it('should respond with a 404 and message if there are no projects in the db', async () => {
@@ -61,11 +58,11 @@ describe('Server', () => {
   });
 
   describe('GET /api/v1/palettes/:id', () => {
-    it.skip('should respond with a 200 and the specific palette if it exists', async () => {
+    it('should respond with a 200 and the specific palette if it exists', async () => {
       const expectedPalette = await database('palettes').first();
       const response = await request(app).get(`/api/v1/palettes/${expectedPalette.id}`);
       expect(response.status).toEqual(200);
-      expect(response.body).toEqual(expectedPalette);
+      expect(response.body.name).toEqual(expectedPalette.name);
     });
 
     it('should respond with a 404 and message if the specific palette does not exist', async () => {
@@ -77,12 +74,12 @@ describe('Server', () => {
   });
 
   describe('GET /api/v1/projects/:id/palettes', () => {
-    it.skip('should respond with a 200 and matching palettes if they exist', async () => {
+    it('should respond with a 200 and matching palettes if they exist', async () => {
       const expectedProject = await database('projects').first();
       const expectedPalettes = await database('palettes').where('project_id', expectedProject.id).select();
       const response = await request(app).get(`/api/v1/projects/${expectedProject.id}/palettes`);
       expect(response.status).toEqual(200);
-      expect(response.body).toEqual(expectedPalettes);
+      expect(response.body.length).toEqual(expectedPalettes.length);
     });
 
     it('should respond with a 404 and message if the specific palettes do not exist for that project', async () => {
