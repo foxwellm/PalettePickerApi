@@ -10,9 +10,8 @@ app.get('/api/v1/projects', async (req, res) => {
   try {
     let matchingProjects = await database('projects').select();
     if (name) matchingProjects = matchingProjects.filter(project => project.name.toLowerCase().includes(name.toLowerCase()));
-    return matchingProjects.length ? 
-      res.status(200).json(matchingProjects) : 
-      res.status(404).json('No matching projects found.');
+    return matchingProjects.length ? res.status(200).json(matchingProjects) 
+    : res.status(404).json('No matching projects found.');
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -22,9 +21,8 @@ app.get('/api/v1/projects/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const matchingProject = await database('projects').where({ id });
-    return matchingProject.length ? 
-      res.status(200).json(matchingProject[0]) : 
-      res.status(404).json(`No matching project found with id ${id}.`);
+    return matchingProject.length ? res.status(200).json(matchingProject[0])
+    : res.status(404).json(`No matching project found with id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -34,9 +32,8 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const matchingPalette = await database('palettes').where({ id });
-    return matchingPalette.length ? 
-      res.status(200).json(matchingPalette[0]) : 
-      res.status(404).json(`No matching palette found with id ${id}.`);
+    return matchingPalette.length ? res.status(200).json(matchingPalette[0]) 
+    : res.status(404).json(`No matching palette found with id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -47,9 +44,8 @@ app.get('/api/v1/projects/:id/palettes', async (req, res) => {
   try {
     const matchingProject = await database('projects').where({ id });
     const matchingPalettes = await database('palettes').where('project_id', id);
-    return matchingProject.length ? 
-      res.status(200).json(matchingPalettes) : 
-      res.status(404).json(`No matching palettes found with project id ${id}.`);
+    return matchingProject.length ? res.status(200).json(matchingPalettes) 
+    : res.status(404).json(`No matching palettes found with project id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
