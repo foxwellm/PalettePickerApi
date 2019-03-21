@@ -224,13 +224,64 @@ describe('Server', () => {
     });
 
     it('should respond with a 422 and message if name is not provided', async () => {
-
+      const projectToChange = await database('projects').first()
+      const response = await request(app).put(`/api/v1/projects/${projectToChange.id}`);
+      expect(response.status).toEqual(422);
+      expect(response.body).toEqual('Please provide a name.');
     });
 
     it('should respond with a 404 and message if project was not found', async () => {
-
+      const nonExistantProject = 0;
+      const response = await request(app).put(`/api/v1/projects/${nonExistantProject}`).send({ name: 'New Name' });
+      expect(response.status).toEqual(404);
+      expect(response.body).toEqual(`No matching project found with id ${nonExistantProject}.`);
     });
-
   });
 
+  describe('PUT /api/v1/palettes/:id', () => {
+    it('should respond with a 204 if palette was successfully updated', async () => {
+      const paletteToChange = await database('palettes').first();
+      const updatedPalette = {
+        name: 'New Name',
+        color1: 'ffffff',
+        color2: 'ffffff',
+        color3: 'ffffff',
+        color4: 'ffffff',
+        color5: 'ffffff'
+      };
+      const response = await request(app).put(`/api/v1/palettes/${paletteToChange.id}`).send(updatedPalette);
+      const palette = await database('palettes').first();
+      expect(response.status).toEqual(204);
+      expect(palette).not.toEqual(updatedPalette);
+    });
+
+    it('should respond with a 422 and message if correct params are not provided', async () => {
+      const paletteToChange = await database('palettes').first();
+      const updatedPalette = {
+        name: 'New Name',
+        color1: 'ffffff',
+        color2: 'ffffff',
+        color3: 'ffffff',
+        color4: 'ffffff'
+      };
+      const response = await request(app).put(`/api/v1/palettes/${paletteToChange.id}`).send(updatedPalette);
+      expect(response.status).toEqual(422);
+      expect(response.body).toEqual('Expected format: { name: <String>, color1: <String>, color2: <String>, color3: <String>, color4: <String>, color5: <String>, project_id: <Number>}. You\'re missing a color5 property.');
+    });
+
+    it('should respond with a 404 and message if palette was not found', async () => {
+      const nonExistantPalette = 0;
+      const updatedPalette = {
+        name: 'New Name',
+        color1: 'ffffff',
+        color2: 'ffffff',
+        color3: 'ffffff',
+        color4: 'ffffff',
+        color5: 'ffffff'
+      };
+      const response = await request(app).put(`/api/v1/palettes/${nonExistantPalette}`).send(updatedPalette);
+      expect(response.status).toEqual(404);
+      expect(response.body).toEqual(`No matching palette found with id ${nonExistantPalette}.`);
+    });
+  });
 });
