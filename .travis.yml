@@ -1,3 +1,10 @@
 language: node_js
 node_js: 
   - "node"
+
+services: 
+  -postgresql 
+
+  before_script:
+  - psql -c 'create database palette_picker_test;' -U postgres
+
