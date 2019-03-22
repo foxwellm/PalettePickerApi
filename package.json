@@ -17,7 +17,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
