@@ -1,9 +1,17 @@
 language: node_js
-node_js: 
-  - "node"
-services: 
-  - postgresql 
+node_js:
+- node
+services:
+- postgresql
 before_script:
-  - psql -c 'create database palette_picker_test;' -U postgres
-  - npm run migrate
-  - npm run seed
+- psql -c 'create database palette_picker_test;' -U postgres
+- npm run migrate
+- npm run seed
+notifications:
+  email: false
+deploy:
+  provider: heroku
+  api_key:
+    secure: Vm0u3zgcvnvTt4b5nOpKl3PcyLA6Oxxgmi0RupWkNG5lWrq8xpar7K6ylqJU9g/2URao473jxi2+7/7R5Df7LcVyz4NaAvgdDDi3A5uvD2E19/hSpJpwlJvvQ5w+mdxNIQoW4FgvADNqnHfDqvo3nfnjeOJQ7e5N8W0MTsgweNBhin5mQ0VLdsMYQTmo+mcBwMvmzW/U76GLHjffN23v+zuztiGx/yLreWQdWD0eUQCyBLTJU4g9sMcXWqHpdlvSNIBNP9UmbaaDKCv/FN8Evb7hehay/bzEz4AJoGQZdZsC/X2lG7b1FxaLm5Pr7Dz1kAl9mQo881fk+tGWioaJSKyo06UUq+DYeN3hOBhpLOEsbV8HLPWkGQGQjjj/oBodo4PI1oReVOkqkz7CmBV0Rja+4xMwmrDLG3pEpycKMB5CiqasT6+T5MHiboMecrXvDIyotQxrJ1cGk+i/8xuWvdgoBhda8oIwFAdRHvPz/NoYvQES60kuUG8ksVHxMJplWg/Vj9c2MpSuLgyFng1szDdQmptUQJB2P6xtTv9QCI3H2JeG3mXl3Ujzpja56z2FvwTex2TJciFxCw0anPW7whef+bB70teQkYyOOfTxIVVSsFGRzVQ2+uH53E7oS95desNK5q2YTJOpDgSCLiGo3NfYWcVQE0zknIncFqcdqRU=
+  app: pal-picker-api
+  skip_cleanup: true
