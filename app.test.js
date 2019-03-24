@@ -103,7 +103,7 @@ describe('Server', () => {
       const name = 'Project 1';
       const response = await request(app).post('/api/v1/projects').send({ name });
       expect(response.status).toEqual(409);
-      expect(response.body).toEqual(`Conflict. project name ${name} already exists.`);
+      expect(response.body).toEqual(`Project name ${name} already exists.`);
     });
 
     it('should respond with a 422 and message if no name provided', async () => {
@@ -165,12 +165,12 @@ describe('Server', () => {
   });
 
   describe('DELETE /api/v1/palettes/:id', () => {
-    it('should respond with a 202 if it was successful and have removed a palette from the database', async () => {
+    it('should respond with a 204 if it was successful and have removed a palette from the database', async () => {
       const allPalettes = await database('palettes');
       const numExpectedPalettes = allPalettes.length - 1;
       const response = await request(app).delete(`/api/v1/palettes/${allPalettes[0].id}`);
       const remainingPalettes = await database('palettes');
-      expect(response.status).toEqual(202);
+      expect(response.status).toEqual(204);
       expect(numExpectedPalettes).toEqual(remainingPalettes.length);
     });
 
@@ -183,23 +183,23 @@ describe('Server', () => {
   });
 
   describe('DELETE /api/v1/projects/:id', () => {
-    it('should respond with a 202 if it was successful and has removed a project from the database with all associated palettes', async () => {
+    it('should respond with a 204 if it was successful and has removed a project from the database with all associated palettes', async () => {
       const projectToDelete = await database('projects').first();
       const allPalettes = await database('palettes');
       const palettesToDelete = await database('palettes').where('project_id', projectToDelete.id);
       const numExpectedPalettes= allPalettes.length - palettesToDelete.length;
       const response = await request(app).delete(`/api/v1/projects/${projectToDelete.id}`);
       const remainingPalettes = await database('palettes');
-      expect(response.status).toEqual(202);
+      expect(response.status).toEqual(204);
       expect(numExpectedPalettes).toEqual(remainingPalettes.length);
     });
 
-    it('should respond with a 202 if it was successful and has removed a project from the database even if no associated palettes exist', async () => {
+    it('should respond with a 204 if it was successful and has removed a project from the database even if no associated palettes exist', async () => {
       const projectToDelete = await database('projects').where('name', 'Empty')
       const numExpectedPalettes = await database('palettes');
       const response = await request(app).delete(`/api/v1/projects/${projectToDelete[0].id}`);
       const remainingPalettes = await database('palettes');
-      expect(response.status).toEqual(202);
+      expect(response.status).toEqual(204);
       expect(numExpectedPalettes.length).toEqual(remainingPalettes.length);
     });
 

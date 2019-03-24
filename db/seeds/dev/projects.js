@@ -5,19 +5,19 @@ const projectData = [
     palettes: [
       {
         name: 'Palette1',
-        color1: 'ff0000',
-        color2: 'ffff00',
-        color3: 'ffffff',
-        color4: '808000',
-        color5: '239b56'
+        color1: '#ff0000',
+        color2: '#ffff00',
+        color3: '#ffffff',
+        color4: '#808000',
+        color5: '#239b56'
       },
       {
         name: 'Palette2',
-        color1: '2980b9',
-        color2: '85929e',
-        color3: 'dc7633',
-        color4: '73c6b6',
-        color5: 'd6eaf8'
+        color1: '#2980b9',
+        color2: '#85929e',
+        color3: '#dc7633',
+        color4: '#73c6b6',
+        color5: '#d6eaf8'
       }
     ]
   },
@@ -26,19 +26,19 @@ const projectData = [
     palettes: [
       {
         name: 'Palette1',
-        color1: 'ff0000',
-        color2: 'ffff00',
-        color3: 'ffffff',
-        color4: '808000',
-        color5: '239b56'
+        color1: '#ff0000',
+        color2: '#ffff00',
+        color3: '#ffffff',
+        color4: '#808000',
+        color5: '#239b56'
       },
       {
         name: 'Palette2',
-        color1: '2980b9',
-        color2: '85929e',
-        color3: 'dc7633',
-        color4: '73c6b6',
-        color5: 'd6eaf8'
+        color1: '#2980b9',
+        color2: '#85929e',
+        color3: '#dc7633',
+        color4: '#73c6b6',
+        color5: '#d6eaf8'
       }
     ]
   }

@@ -58,7 +58,7 @@ app.post('/api/v1/projects', async (req, res) => {
   if (!name) return res.status(422).json('No project name provided');
   try {
     const dupProject = await database('projects').where({ name });
-    if (dupProject.length) return res.status(409).json(`Conflict. project name ${name} already exists.`);
+    if (dupProject.length) return res.status(409).json(`Project name ${name} already exists.`);
     const project = { name };
     const newProjectId = await database('projects').insert(project, 'id');
     return res.status(201).json(newProjectId);
@@ -92,7 +92,7 @@ app.delete('/api/v1/palettes/:id', async (req, res) => {
     const matchingPalette = await database('palettes').where({ id });
     if (!matchingPalette.length) return res.status(404).json(`No matching palette found with id ${id}`);
     await database('palettes').where({ id }).del();
-    return res.sendStatus(202);
+    return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -102,12 +102,10 @@ app.delete('/api/v1/projects/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const matchingProject = await database('projects').where({ id });
-    if (matchingProject.length) {
-      await database('palettes').where('project_id', id).del();
-      await database('projects').where({ id }).del()
-      return res.sendStatus(202);
-    }
-    return res.status(404).json(`No matching project found with id ${id}`);
+    if (!matchingProject.length) return res.status(404).json(`No matching project found with id ${id}`);
+    await database('palettes').where('project_id', id).del();
+    await database('projects').where({ id }).del()
+    return res.sendStatus(204);
   } catch (error) {
     return res.status(500).json({ error });
   }
