@@ -103,7 +103,7 @@ describe('Server', () => {
       const name = 'Project 1';
       const response = await request(app).post('/api/v1/projects').send({ name });
       expect(response.status).toEqual(409);
-      expect(response.body).toEqual(`Conflict. project name ${name} already exists.`);
+      expect(response.body).toEqual(`Project name ${name} already exists.`);
     });
 
     it('should respond with a 422 and message if no name provided', async () => {
