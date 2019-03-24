@@ -58,7 +58,7 @@ app.post('/api/v1/projects', async (req, res) => {
   if (!name) return res.status(422).json('No project name provided');
   try {
     const dupProject = await database('projects').where({ name });
-    if (dupProject.length) return res.status(409).json(`Conflict. project name ${name} already exists.`);
+    if (dupProject.length) return res.status(409).json(`Project name ${name} already exists.`);
     const project = { name };
     const newProjectId = await database('projects').insert(project, 'id');
     return res.status(201).json(newProjectId);
