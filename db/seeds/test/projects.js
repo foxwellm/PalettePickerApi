@@ -25,7 +25,7 @@ const projectData = [
     name: 'Project 2',
     palettes: [
       {
-        name: 'Palette1',
+        name: 'Palette3',
         color1: '#ff0000',
         color2: '#ffff00',
         color3: '#ffffff',
@@ -33,7 +33,7 @@ const projectData = [
         color5: '#239b56'
       },
       {
-        name: 'Palette2',
+        name: 'Palette4',
         color1: '#2980b9',
         color2: '#85929e',
         color3: '#dc7633',

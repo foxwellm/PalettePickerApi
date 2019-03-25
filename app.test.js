@@ -29,9 +29,39 @@ describe('Server', () => {
       const expectedProjects = await database('projects').select();
       const response = await request(app).get('/api/v1/projects?name=Project');
       expect(response.status).toEqual(200);
-      expect(response.body.length).toEqual(expectedProjects.length-1);
+      expect(response.body.length).toEqual(expectedProjects.length - 1);
     });
-    
+
+    it('should respond with a 200 and matching projects if a partial name query of a palette is given', async () => {
+      const allPalettes = await database('palettes').select();
+      const testName = 'Palette';
+      const matchingPalettes = allPalettes.reduce((acc, palette) => {
+        if (palette.name.toLowerCase().includes(testName.toLowerCase()) &&
+          acc.find(matchedPalette => matchedPalette.project_id === palette.project_id) === undefined) {
+          acc.push(palette);
+        }
+        return acc;
+      }, [])
+      const response = await request(app).get(`/api/v1/projects?name=${testName}`);
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toEqual(matchingPalettes.length);
+    });
+
+    it('should respond with a 200 and matching projects if a name query of a palette is given', async () => {
+      const allPalettes = await database('palettes').select();
+      const testName = 'Palette1';
+      const matchingPalettes = allPalettes.reduce((acc, palette) => {
+        if (palette.name.toLowerCase().includes(testName.toLowerCase()) &&
+          acc.find(matchedPalette => matchedPalette.project_id === palette.project_id) === undefined) {
+          acc.push(palette);
+        }
+        return acc;
+      }, []);
+      const response = await request(app).get(`/api/v1/projects?name=${testName}`);
+      expect(response.status).toEqual(200);
+      expect(response.body.length).toEqual(matchingPalettes.length);
+    });
+
     it('should respond with a 404 and message if there are no projects in the db', async () => {
       await database('palettes').del();
       await database('projects').del();
@@ -93,7 +123,7 @@ describe('Server', () => {
   describe('POST /api/v1/projects', () => {
     it('should respond with a 201 and add project', async () => {
       const startingProjects = await database('projects');
-      const response = await request(app).post('/api/v1/projects').send({name: 'New Project'});
+      const response = await request(app).post('/api/v1/projects').send({ name: 'New Project' });
       const expectedProjects = await database('projects');
       expect(response.status).toEqual(201);
       expect(startingProjects.length + 1).toEqual(expectedProjects.length);
@@ -187,7 +217,7 @@ describe('Server', () => {
       const projectToDelete = await database('projects').first();
       const allPalettes = await database('palettes');
       const palettesToDelete = await database('palettes').where('project_id', projectToDelete.id);
-      const numExpectedPalettes= allPalettes.length - palettesToDelete.length;
+      const numExpectedPalettes = allPalettes.length - palettesToDelete.length;
       const response = await request(app).delete(`/api/v1/projects/${projectToDelete.id}`);
       const remainingPalettes = await database('palettes');
       expect(response.status).toEqual(204);
@@ -214,7 +244,7 @@ describe('Server', () => {
   describe('PUT /api/v1/projects/:id', () => {
     it('should respond with a 204 if project was successfully updated', async () => {
       const projectToChange = await database('projects').first()
-      const response = await request(app).put(`/api/v1/projects/${projectToChange.id}`).send({ name: 'New Name'});
+      const response = await request(app).put(`/api/v1/projects/${projectToChange.id}`).send({ name: 'New Name' });
       const updatedProject = await database('projects').first();
       expect(response.status).toEqual(204);
       expect(updatedProject).not.toEqual(projectToChange);
