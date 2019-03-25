@@ -10,10 +10,24 @@ app.use(cors());
 app.get('/api/v1/projects', async (req, res) => {
   const name = req.query.name;
   try {
-    let matchingProjects = await database('projects').select();
-    if (name) matchingProjects = matchingProjects.filter(project => project.name.toLowerCase().includes(name.toLowerCase()));
-    return matchingProjects.length ? res.status(200).json(matchingProjects) 
-    : res.status(404).json('No matching projects found.');
+    let allProjects = await database('projects').select();
+    let matchingProjects = [];
+    if (name) {
+      let allPalettes = await database('palettes').select();
+      matchingProjects = allProjects.filter(project => {
+        return project.name.toLowerCase().includes(name.toLowerCase());
+      });
+      allPalettes.forEach(palette => {
+        if (palette.name.toLowerCase().includes(name.toLowerCase()) &&
+          (matchingProjects.find(project => project.id === palette.project_id) === undefined)) {
+          matchingProjects.push(allProjects.find(project => project.id === palette.project_id));
+        }
+      });
+    } else {
+      matchingProjects = allProjects;
+    }
+    return matchingProjects.length ? res.status(200).json(matchingProjects)
+      : res.status(404).json('No matching projects found.');
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -24,7 +38,7 @@ app.get('/api/v1/projects/:id', async (req, res) => {
   try {
     const matchingProject = await database('projects').where({ id });
     return matchingProject.length ? res.status(200).json(matchingProject[0])
-    : res.status(404).json(`No matching project found with id ${id}.`);
+      : res.status(404).json(`No matching project found with id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -34,8 +48,8 @@ app.get('/api/v1/palettes/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const matchingPalette = await database('palettes').where({ id });
-    return matchingPalette.length ? res.status(200).json(matchingPalette[0]) 
-    : res.status(404).json(`No matching palette found with id ${id}.`);
+    return matchingPalette.length ? res.status(200).json(matchingPalette[0])
+      : res.status(404).json(`No matching palette found with id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -46,8 +60,8 @@ app.get('/api/v1/projects/:id/palettes', async (req, res) => {
   try {
     const matchingProject = await database('projects').where({ id });
     const matchingPalettes = await database('palettes').where('project_id', id);
-    return matchingProject.length ? res.status(200).json(matchingPalettes) 
-    : res.status(404).json(`No matching palettes found with project id ${id}.`);
+    return matchingProject.length ? res.status(200).json(matchingPalettes)
+      : res.status(404).json(`No matching palettes found with project id ${id}.`);
   } catch (error) {
     return res.status(500).json({ error });
   }
@@ -77,7 +91,7 @@ app.post('/api/v1/palettes', async (req, res) => {
   }
   try {
     const { name, project_id } = newPalette;
-    const dupPalette = await database('palettes').where({ name, project_id});
+    const dupPalette = await database('palettes').where({ name, project_id });
     if (dupPalette.length) return res.status(409).json(`Conflict. palette name ${name} already exists in project id ${project_id}.`);
     const newPaletteId = await database('palettes').insert(newPalette, 'id')
     return res.status(201).json(newPaletteId)
